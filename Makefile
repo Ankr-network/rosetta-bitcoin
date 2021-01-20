@@ -1,6 +1,6 @@
 .PHONY: deps build run lint mocks run-mainnet-online run-mainnet-offline run-testnet-online \
 	run-testnet-offline check-comments add-license check-license shorten-lines test \
-	coverage spellcheck salus build-local coverage-local format check-format
+	coverage spellcheck salus build-local coverage-local format check-format docker-build
 
 ADDLICENSE_CMD=go run github.com/google/addlicense
 ADDLICENCE_SCRIPT=${ADDLICENSE_CMD} -c "Coinbase, Inc." -l "apache" -v
@@ -88,3 +88,32 @@ mocks:
 	mockery --dir indexer --all --case underscore --outpkg indexer --output mocks/indexer;
 	mockery --dir services --all --case underscore --outpkg services --output mocks/services;
 	${ADDLICENCE_SCRIPT} .;
+
+
+### AnkrNetwork
+docker-build:
+	@echo "build docker image"
+	@BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD); \
+	if [[ $$BRANCH_NAME == "develop" ]]; then \
+		ENV="stage"; \
+	elif [[ $$BRANCH_NAME == "master" ]]; then \
+		ENV="prod"; \
+	else \
+		ENV="feat"; \
+	fi; \
+	docker build --build-arg GITHUB_USER=$$GITHUB_USER --build-arg GITHUB_TOKEN=$$GITHUB_TOKEN -t ankrnetwork/rosetta-bitcoin:$$ENV .
+
+.PHONY: docker-build
+docker-push: docker-build
+	@echo "tag & push image"
+	@BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD); SHA1_SHORT=$(shell git rev-parse --short HEAD); DATE=$(shell date +%Y%m%d%H%M%S); \
+	if [[ $$BRANCH_NAME == "develop" ]]; then \
+		ENV="stage"; \
+	elif [[ $$BRANCH_NAME == "master" ]]; then \
+		ENV="prod"; \
+	else \
+		ENV="feat"; \
+	fi;  \
+	docker tag ankrnetwork/rosetta-bitcoin:$$ENV  ankrnetwork/rosetta-bitcoin:$$SHA1_SHORT; \
+	docker push ankrnetwork/rosetta-bitcoin:$$SHA1_SHORT; \
+	docker push ankrnetwork/rosetta-bitcoin:$$ENV;
