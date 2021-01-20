@@ -89,7 +89,6 @@ mocks:
 	mockery --dir services --all --case underscore --outpkg services --output mocks/services;
 	${ADDLICENCE_SCRIPT} .;
 
-
 ### AnkrNetwork
 docker-build:
 	@echo "build docker image"
