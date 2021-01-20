@@ -74,7 +74,7 @@ workflows:
           context: cicd
           filters:
             branches:
-              only:
+              ignore:
                 - /feature\/.*/
       - deploy-stage:
           context: cicd
