@@ -1,6 +1,6 @@
 .PHONY: deps build run lint mocks run-mainnet-online run-mainnet-offline run-testnet-online \
 	run-testnet-offline check-comments add-license check-license shorten-lines test \
-	coverage spellcheck salus build-local coverage-local format check-format docker-build
+	coverage spellcheck salus build-local coverage-local format check-format
 
 ADDLICENSE_CMD=go run github.com/google/addlicense
 ADDLICENCE_SCRIPT=${ADDLICENSE_CMD} -c "Coinbase, Inc." -l "apache" -v
@@ -90,6 +90,7 @@ mocks:
 	${ADDLICENCE_SCRIPT} .;
 
 ### AnkrNetwork
+.PHONY: docker-build
 docker-build:
 	@echo "build docker image"
 	@BRANCH_NAME=$(shell git rev-parse --abbrev-ref HEAD); \

@@ -76,4 +76,17 @@ workflows:
             branches:
               only:
                 - /feature\/.*/
-
+      - deploy-stage:
+          context: cicd
+          requires:
+            - build-with-machine
+          filters:
+            branches:
+              only: develop
+      - deploy-prod:
+          context: cicd
+          requires:
+            - build-with-machine
+          filters:
+            branches:
+              only: master
